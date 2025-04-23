@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold">Entries for {{ month_name }}</h1>
+        <a href="{{ url_for('new_entry') }}" 
+           class="bg-blue-500 text-white hover:bg-blue-600 px-4 py-2 rounded font-medium">
+            New Entry
+        </a>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="{% if category == 'error' %}bg-red-100 border-red-400 text-red-700{% else %}bg-green-100 border-green-400 text-green-700{% endif %} px-4 py-3 rounded mb-4">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% if entries %}
+            {% for entry in entries %}
+                <div class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="text-4xl">{{ entry.emoji or '📝' }}</div>
+                        <div class="text-gray-600 text-sm">{{ entry.date.strftime('%B %d, %Y') }}</div>
+                    </div>
+                    <h2 class="text-xl font-semibold mb-2">{{ entry.title }}</h2>
+                    <p class="text-gray-600 line-clamp-3">{{ entry.content }}</p>
+                    <a href="{{ url_for('view_entry', entry_id=entry.id) }}" 
+                       class="inline-block mt-4 text-blue-500 hover:text-blue-600">
+                        Read more →
+                    </a>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-span-full text-center py-12">
+                <p class="text-gray-500 text-lg">No entries found for {{ month_name }}.</p>
+                <a href="{{ url_for('new_entry') }}" 
+                   class="inline-block mt-4 text-blue-500 hover:text-blue-600">
+                    Create your first entry →
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="mt-12">
+        <h2 class="text-xl font-semibold mb-4">View entries by month</h2>
+        <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {% for month_num, name in months %}
+                <a href="{{ url_for('month_entries', month=month_num) }}"
+                   class="text-center py-2 px-4 rounded {% if month_num == current_month %}bg-blue-500 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
+                    {{ name }}
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

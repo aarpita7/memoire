@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Memoire</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Header -->
+        <div class="header">
+            <div class="time-display">
+                <div id="currentTime">07:21</div>
+                <div id="currentDay">Wednesday</div>
+            </div>
+            <div class="header-actions">
+                <a href="{{ url_for('new_entry_page') }}" class="btn-primary">New Entry +</a>
+                <a href="{{ url_for('logout') }}" class="btn-cancel">Logout</a>
+            </div>
+        </div>
+
+        <div class="dashboard-content">
+            <!-- Left Sidebar -->
+            <div class="sidebar">
+                <!-- Stats Section -->
+                <div class="stats-section">
+                    <h3>Emotion Stats</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-emoji">😊</div>
+                            <div class="stat-value">{{ emotions.get('happy', 0) }}</div>
+                            <div class="stat-label">Happy Moments</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-emoji">🙏</div>
+                            <div class="stat-value">{{ emotions.get('grateful', 0) }}</div>
+                            <div class="stat-label">Grateful Times</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-emoji">😢</div>
+                            <div class="stat-value">{{ emotions.get('sad', 0) }}</div>
+                            <div class="stat-label">Sad Moments</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-emoji">😠</div>
+                            <div class="stat-value">{{ emotions.get('angry', 0) }}</div>
+                            <div class="stat-label">Angry Times</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-emoji">😐</div>
+                            <div class="stat-value">{{ emotions.get('neutral', 0) }}</div>
+                            <div class="stat-label">Neutral Days</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reading List -->
+                <div class="reading-list">
+                    <h3>Reading List</h3>
+                    {% for book in books %}
+                    <div class="list-item">
+                        <input type="checkbox" {% if book.completed %}checked{% endif %}>
+                        <span {% if book.completed %}class="completed"{% endif %}>{{ book.title }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Movies List -->
+                <div class="movies-list">
+                    <h3>Movies & Series</h3>
+                    {% for movie in movies %}
+                    <div class="list-item">
+                        <input type="checkbox" {% if movie.completed %}checked{% endif %}>
+                        <span {% if movie.completed %}class="completed"{% endif %}>{{ movie.title }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <h2>My Journal</h2>
+                <p class="subtitle">Track your journey and emotions</p>
+
+                <!-- Month Grid -->
+                <div class="month-grid">
+                    {% set months = [
+                        ('January', '❤️', 'pink'),
+                        ('February', '🧸', 'peach'),
+                        ('March', '🌸', ''),
+                        ('April', '🌱', ''),
+                        ('May', '🌺', ''),
+                        ('June', '🦋', ''),
+                        ('July', '🌞', ''),
+                        ('August', '🌊', ''),
+                        ('September', '📚', ''),
+                        ('October', '🎃', ''),
+                        ('November', '🍁', ''),
+                        ('December', '❄️', '')
+                    ] %}
+                    {% for month, emoji, class in months %}
+                    <a href="{{ url_for('month_view', month=loop.index) }}" class="month-card {{ class }}">
+                        <span>{{ emoji }}</span>
+                        <p>{{ month }}</p>
+                    </a>
+                    {% endfor %}
+                </div>
+
+                <!-- Recent Entries -->
+                <div class="entries-section">
+                    <div class="entries-header">
+                        <h3>Recent Entries</h3>
+                        <a href="{{ url_for('new_entry_page') }}" class="btn-primary">New Entry</a>
+                    </div>
+                    
+                    {% for entry in entries[:5] %}
+                    <div class="entry">
+                        <div class="entry-header">
+                            <h4>{{ entry.emoji }} {{ entry.title }}</h4>
+                            <span class="date">{{ entry.date }}</span>
+                        </div>
+                        <p>{{ entry.content[:200] }}{% if entry.content|length > 200 %}...{% endif %}</p>
+                    </div>
+                    {% endfor %}
+                    
+                    {% if not entries %}
+                    <div class="entry">
+                        <p class="text-muted">No entries yet. Start writing your journey!</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Update time
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: false 
+            });
+            const dayString = now.toLocaleDateString('en-US', { weekday: 'long' });
+            
+            document.getElementById('currentTime').textContent = timeString;
+            document.getElementById('currentDay').textContent = dayString;
+        }
+
+        updateTime();
+        setInterval(updateTime, 1000);
+    </script>
+</body>
+</html> 
